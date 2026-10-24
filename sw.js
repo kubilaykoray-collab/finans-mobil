@@ -1,5 +1,5 @@
 // Uygulama kabuğunu önbelleğe alır; finans verisi burada değil, telefonun yerel deposunda durur.
-const SURUM = 'finans-v2';
+const SURUM = 'finans-v3';
 const DOSYALAR = ['./', 'index.html', 'manifest.webmanifest', 'ikon.svg', 'ikon-192.png', 'ikon-512.png'];
 
 self.addEventListener('install', e => {

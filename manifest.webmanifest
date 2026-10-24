@@ -1,6 +1,7 @@
 {
-  "name": "Kişisel Finans",
-  "short_name": "Finans",
+  "name": "Berrak",
+  "short_name": "Berrak",
+  "description": "Paranı berrak gör. Kişisel finans asistanı; veriler yalnızca telefonda.",
   "lang": "tr",
   "start_url": "./",
   "scope": "./",

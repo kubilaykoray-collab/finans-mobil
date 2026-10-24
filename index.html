@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kişisel Finans</title>
+<title>Berrak</title>
 <meta name="theme-color" content="#0f1420">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -90,16 +90,32 @@ input[type=search]{flex:1 1 100%}
 .ozet{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:6px;gap:8px}
 .ozet b{color:var(--text)}
 ol{padding-left:20px;margin:6px 0}ol li{margin:4px 0}
+.buyuk{font-size:40px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:4px 0}
+.hedefBar{height:12px;background:var(--surf);border-radius:6px;overflow:hidden;margin:10px 0 6px;position:relative}
+.hedefBar i{display:block;height:100%;border-radius:6px}
+.hedefBar u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--text);opacity:.6}
+.cipler{display:flex;flex-wrap:wrap;gap:8px}
+.kcip{background:var(--surf);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;align-items:center;gap:6px;font-family:inherit}
+.kcip.on{border-color:var(--blue);background:#1d2c4a}
+.kcip b{font-size:18px;font-weight:400}
+#tost{position:fixed;left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:30;background:#24304a;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 20px #0008;max-width:608px;margin:0 auto}
+#tost span{flex:1}
+#tost button{background:none;border:0;color:var(--blue);font-weight:700;font-size:15px}
+.seri{font-size:30px;width:40px;text-align:center}
+.ikiBtn{display:flex;gap:8px}.ikiBtn .btn{margin:6px 0}
+.sayac{font-variant-numeric:tabular-nums;color:var(--yellow);font-size:13px}
+details summary{cursor:pointer;color:var(--blue);font-size:14px;padding:10px 0 4px;list-style:none}
+details summary::-webkit-details-marker{display:none}
 </style>
 </head>
 <body>
 <header><button class="hbtn" id="geri" hidden aria-label="Geri">‹</button><h1 id="baslik">Özet</h1><span id="altbaslik"></span><button class="hbtn" id="gizle" aria-label="Tutarları gizle">◉</button></header>
 <main id="ekran"></main>
 <nav id="menu">
+  <button data-e="bugun"><b>☀</b>Bugün</button>
   <button data-e="ozet"><b>◔</b>Özet</button>
-  <button data-e="asistan"><b>✦</b>Asistan</button>
   <button data-e="ekle" class="ekle"><b>+</b>Ekle</button>
-  <button data-e="islem"><b>☰</b>İşlemler</button>
+  <button data-e="asistan"><b>✦</b>Asistan</button>
   <button data-e="diger"><b>⋯</b>Diğer</button>
 </nav>
 <input type="file" id="dosya" accept=".json,application/json" hidden>
@@ -108,8 +124,9 @@ ol{padding-left:20px;margin:6px 0}ol li{margin:4px 0}
 const AYLAR=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const GUNLER=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
 const BUTCE_AD={Yasam:'Yaşam',Transfer:'Transfer',Yatirim:'Yatırım',Borc:'Borç'};
-const K={veri:'finans_veri_v1',girdi:'finans_girdi_v1',limit:'finans_limit_v1',ayar:'finans_ayar_v1'};
-const ALT_EKRAN=['kategori','yer','butce','hesap','veri','guvenlik'];
+const K={veri:'finans_veri_v1',girdi:'finans_girdi_v1',limit:'finans_limit_v1',ayar:'finans_ayar_v1',istek:'finans_istek_v1'};
+const ALT_EKRAN=['islem','kategori','yer','butce','hesap','veri','ayar'];
+const UYGULAMA_URL='https://kubilaykoray-collab.github.io/finans-mobil/';
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -130,8 +147,9 @@ const depo={
 let V=null;                              // bilgisayardan gelen veri + telefonda girilenler
 let G=depo.oku(K.girdi,[]);              // telefonda girilen, henüz veri dosyasına girmemiş kayıtlar
 let L=depo.oku(K.limit,{});              // kategori -> aylık limit
-let A=depo.oku(K.ayar,{});               // pin, gizli
-const D={ekran:'ozet',donem:'12',tur:'gider',butce:'Yasam',kat:'',ara:'',limit:150,acik:-1,ekTur:'gider'};
+let A=depo.oku(K.ayar,{});               // pin, gizli, hedef, saat, seri, seriSon
+let I=depo.oku(K.istek,[]);              // dürtü freni bekleme listesi
+const D={ekran:'bugun',donus:'diger',ekKat:'',donem:'12',tur:'gider',butce:'Yasam',kat:'',ara:'',limit:150,acik:-1,ekTur:'gider'};
 
 const TL=n=>A.gizli?'••• ₺':Math.round(n).toLocaleString('tr-TR')+' ₺';
 
@@ -187,17 +205,146 @@ function aylikSeri(liste,aylar){const m={};aylar.forEach(a=>m[a]=0);liste.forEac
 function ciz(){
   const sekme=ALT_EKRAN.includes(D.ekran)?'diger':D.ekran;
   $$('#menu button').forEach(b=>b.classList.toggle('on',b.dataset.e===sekme));
-  const basliklar={ozet:'Özet',asistan:'Asistan',ekle:'Kayıt Ekle',islem:'İşlemler',diger:'Diğer',kategori:'Kategoriler',yer:'Nereye Gitti?',butce:'Bütçe Limitleri',hesap:'Hesaplar',veri:'Veri',guvenlik:'Güvenlik'};
+  const basliklar={bugun:'Bugün',ozet:'Özet',asistan:'Asistan',ekle:'Kayıt Ekle',islem:'İşlemler',diger:'Diğer',kategori:'Kategoriler',yer:'Nereye Gitti?',butce:'Bütçe Limitleri',hesap:'Hesaplar',veri:'Veri',ayar:'Ayarlar'};
   $('#baslik').textContent=basliklar[D.ekran];
   $('#geri').hidden=!ALT_EKRAN.includes(D.ekran);
   $('#altbaslik').innerHTML=V?`${tarihTR(V.ilk)}<br>${tarihTR(V.son)}`:'';
   $('#gizle').textContent=A.gizli?'◌':'◉';
-  if(!V&&D.ekran!=='veri'&&D.ekran!=='guvenlik'){D.ekran='veri';return ciz();}
-  ({ozet:ozetEkrani,asistan:asistanEkrani,ekle:ekleEkrani,islem:islemEkrani,diger:digerEkrani,kategori:kategoriEkrani,
-    yer:yerEkrani,butce:butceEkrani,hesap:hesapEkrani,veri:veriEkrani,guvenlik:guvenlikEkrani})[D.ekran]();
+  if(!V&&D.ekran!=='veri'&&D.ekran!=='ayar'){D.ekran='veri';return ciz();}
+  ({bugun:bugunEkrani,ozet:ozetEkrani,asistan:asistanEkrani,ekle:ekleEkrani,islem:islemEkrani,diger:digerEkrani,kategori:kategoriEkrani,
+    yer:yerEkrani,butce:butceEkrani,hesap:hesapEkrani,veri:veriEkrani,ayar:ayarEkrani})[D.ekran]();
   window.scrollTo(0,0);
 }
-function git(ekran,ayar){Object.assign(D,{kat:'',ara:'',limit:150,acik:-1},ayar||{});D.ekran=ekran;ciz();}
+function git(ekran,ayar){
+  if(ALT_EKRAN.includes(ekran)&&!ALT_EKRAN.includes(D.ekran))D.donus=D.ekran;   // geri tuşu geldiğin yere döner
+  Object.assign(D,{kat:'',ara:'',limit:150,acik:-1,sadeceAnom:false},ayar||{});D.ekran=ekran;ciz();
+}
+
+// ── DEHB dostu yardımcılar: anında geri bildirim, geri al, zaman karşılığı, seri ──
+const EMOJI=[['MARKET','🛒'],['YEME','🍽️'],['ULASIM','🚌'],['AKARYAKIT','⛽'],['ALKOL','🚬'],['ABONELIK','📺'],['FATURA','💡'],
+  ['EVCIL','🐾'],['SAGLIK','💊'],['GIYIM','👕'],['KIRA','🏠'],['EGLENCE','🎉'],['SANS','🎲'],['AILE','👪'],['TRANSFER','↔️'],
+  ['ATM','🏧'],['KREDI KART','💳'],['KRIPTO','📈'],['DOVIZ','💱'],['FAIZ','🏦'],['KMH','🏦'],['MAAS','💰'],['GELIR','💰'],
+  ['ONLINE','📦'],['POS','🧾'],['KOMISYON','🏦'],['BORC','🤝']];
+const emoji=k=>{const n=norm(k);const e=EMOJI.find(([a])=>n.includes(a));return e?e[1]:'•';};
+const titresim=()=>{try{navigator.vibrate&&navigator.vibrate(12);}catch(e){}};
+const yeniId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const tarihEkle=(t,g)=>{const d=new Date(t+'T12:00:00');d.setDate(d.getDate()+g);return d.toISOString().slice(0,10);};
+let tostZaman=0;
+function tost(metin,geriAl){
+  let t=$('#tost');if(t)t.remove();
+  t=document.createElement('div');t.id='tost';t.innerHTML=`<span>${metin}</span>${geriAl?'<button>Geri al</button>':''}`;
+  document.body.appendChild(t);
+  if(geriAl)t.querySelector('button').onclick=()=>{t.remove();geriAl();};
+  clearTimeout(tostZaman);tostZaman=setTimeout(()=>t.remove(),geriAl?6000:3000);
+}
+// Saatlik net kazanç: ayarlardan, yoksa son 12 ayın yaşam gelirinden (ayda ~173 çalışma saati)
+function saatUcret(){
+  if(A.saat>0)return A.saat;
+  const s=new Set(V.son12);
+  return V.tum.filter(x=>x.b==='Yasam'&&x.u>0&&s.has(x.m)).reduce((a,x)=>a+x.u,0)/12/173;
+}
+function saatKarsilik(u){
+  const s=saatUcret();if(!(s>0)||!(u>0)||A.gizli)return '';
+  const h=u/s;
+  return h<1?`≈ ${Math.max(1,Math.round(h*60))} dakikalık çalışman`:`≈ ${h<10?h.toFixed(1).replace('.',','):Math.round(h)} saatlik çalışman`;
+}
+function seriGun(){return A.seriSon&&A.seriSon>=tarihEkle(bugun(),-1)?(A.seri||0):0;}
+function seriIsaretle(){
+  const b=bugun();if(A.seriSon===b)return;
+  A.seri=(A.seriSon===tarihEkle(b,-1)?(A.seri||0):0)+1;A.seriSon=b;depo.yaz(K.ayar,A);
+}
+function girdiKaydet(g){
+  G.push(g);const ok=depo.yaz(K.girdi,G);birlestir();seriIsaretle();titresim();
+  tost(ok?`${emoji(g.k)} Kaydedildi${g.u<0&&saatKarsilik(-g.u)?' · '+saatKarsilik(-g.u):''}`:'Telefona kaydedilemedi (tarayıcı depolaması kapalı)',
+    ()=>{G=G.filter(x=>x.id!==g.id);depo.yaz(K.girdi,G);birlestir();ciz();});
+}
+function dosyaVer(ad,metin,tip){
+  const blob=new Blob([metin],{type:tip});
+  try{
+    const f=new File([blob],ad,{type:tip});
+    if(navigator.canShare&&navigator.canShare({files:[f]}))return navigator.share({files:[f],title:ad}).catch(()=>{});
+  }catch(e){}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=ad;document.body.appendChild(a);a.click();a.remove();
+}
+
+// ── Bugün: tek bakışta tek rakam ───────────────────────────────
+function bugunEkrani(){
+  const b=bugun(),ay=b.slice(0,7),d=new Date();
+  const ayGun=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(),kalanGun=ayGun-d.getDate()+1;
+  const harc=yasamGider(V.tum.filter(x=>x.m===ay)).reduce((s,x)=>s-x.u,0);
+  const bugunH=yasamGider(V.tum.filter(x=>x.t===b)).reduce((s,x)=>s-x.u,0);
+  let h=`<div class="not" style="margin-bottom:8px">${GUNLER[d.getDay()]}, ${d.getDate()} ${AYLAR[d.getMonth()]}</div>`;
+  if(A.hedef>0){
+    const kalan=A.hedef-harc,gunluk=kalan/kalanGun,p=Math.min(100,harc/A.hedef*100),zaman=(d.getDate()-1)/ayGun*100;
+    const renk=kalan<0?'red':p>zaman+10?'yellow':'green';
+    h+=`<div class="kart"><h2>${AYLAR[d.getMonth()]} · harcayabileceğin</h2>
+      <div class="buyuk ${kalan<0?'kirmizi':''}">${TL(kalan)}</div>
+      <div class="hedefBar"><i style="width:${p}%;background:var(--${renk})"></i><u style="left:${zaman}%"></u></div>
+      <div class="ozet"><span>${TL(harc)} / ${TL(A.hedef)} harcandı</span><span>${kalanGun} gün kaldı</span></div>
+      <div class="ozet" style="font-size:16px;margin-top:8px"><span>Bugün için</span><b class="${gunluk<0?'kirmizi':'yesil'}">${gunluk<0?'hedef aşıldı':TL(gunluk)}</b></div>
+      ${bugunH?`<div class="ozet"><span>Bugün harcanan</span><b>${TL(bugunH)}</b></div>`:''}
+      <div class="not" style="margin-top:6px">${p>zaman+10&&kalan>=0?'Ayın bu noktası için hızlı gidiyorsun (beyaz çizgi = bugün). ':''}${V.son<ay+'-01'?'Banka verisi bu ayı kapsamıyor; şimdilik yalnızca telefondan girdiklerin sayılıyor.':''}</div></div>`;
+  }else{
+    const s=new Set(V.son12);
+    const ortGelir=V.tum.filter(x=>x.b==='Yasam'&&x.u>0&&s.has(x.m)).reduce((a,x)=>a+x.u,0)/12;
+    const oneri=Math.max(1000,Math.floor(ortGelir*0.9/1000)*1000);
+    h+=`<div class="kart form"><h2>Tek bir hedef koy</h2><div>Ayda en fazla ne kadar harcamak istiyorsun? Uygulama bunu her gün "bugün için şu kadar" diye tek bir rakama çevirir. Başka bir şeyi takip etmen gerekmez.</div>
+      <input id="hedefGir" class="tutarGir" inputmode="numeric" value="${oneri}" style="margin-top:12px">
+      <div class="not" style="margin-top:6px">Öneri: aylık ortalama gelirinin (${TL(ortGelir)}) %90'ı. Böylece her ay biraz birikir.</div>
+      <button class="btn" id="hedefKaydet">Hedefi koy</button></div>`;
+  }
+  const s=seriGun(),tamam=A.seriSon===b;
+  h+=`<div class="kart"><div style="display:flex;align-items:center;gap:12px"><div class="seri">${s?'🔥':'○'}</div>
+    <div style="flex:1"><b>${s?s+' gündür her gün kayıt':'Bugün yeni bir seri başlat'}</b><div class="not">${tamam?'Bugün tamam. Yarın 1 dakika yeter.':'Günde 1 dakika: harcamanı gir ya da "bugün harcamam yok" de.'}</div></div></div>
+    ${tamam?'':`<div class="ikiBtn"><button class="btn" id="hizliEkle">+ Harcama gir</button><button class="btn ikincil" id="harcamaYok">Harcamam yok</button></div>`}</div>`;
+  const sb=sablonlar();
+  if(sb.length)h+=`<div class="kart"><h2>Tek dokunuşla tekrar</h2><div class="cipler">${sb.map((g,i)=>`<button class="kcip" data-sablon="${i}"><b>${emoji(g.k)}</b>${esc(g.a||g.k)} · ${TL(Math.abs(g.u))}</button>`).join('')}</div></div>`;
+  h+=istekKarti();
+  const c=oncelikli()[0];
+  if(c)h+=`<div class="kart ic ${c.tur} tik" id="tekOneri"><h2>Asistandan tek öneri</h2><h3>${esc(c.baslik)}</h3><p>${c.metin}</p><div class="git">Tüm öneriler ›</div></div>`;
+  $('#ekran').innerHTML=h;
+  if($('#hedefKaydet'))$('#hedefKaydet').onclick=()=>{const v=parseFloat($('#hedefGir').value.replace(/\./g,''));if(v>0){A.hedef=v;depo.yaz(K.ayar,A);titresim();ciz();}};
+  if($('#hizliEkle'))$('#hizliEkle').onclick=()=>git('ekle');
+  if($('#harcamaYok'))$('#harcamaYok').onclick=()=>{seriIsaretle();titresim();tost('🔥 Seri devam ediyor');ciz();};
+  $$('[data-sablon]').forEach(e=>e.onclick=()=>{const g=sb[+e.dataset.sablon];girdiKaydet({...g,id:yeniId(),t:bugun(),s:new Date().toTimeString().slice(0,5)});ciz();});
+  istekBagla();
+  if($('#tekOneri'))$('#tekOneri').onclick=()=>git('asistan');
+}
+// Telefonda daha önce girilen kayıtlardan en yeni 6 farklı kalıp
+function sablonlar(){
+  const g=new Map();
+  V.tum.filter(x=>x.tel||x.r).forEach(x=>{const k=x.k+'|'+x.a+'|'+x.u;if(!g.has(k))g.set(k,{k:x.k,a:x.a===x.k?'':x.a,u:x.u,h:x.h});});
+  return [...g.values()].slice(0,6);
+}
+
+// ── Dürtü freni: 48 saat bekle, sonra karar ver ──────────────────
+function istekKarti(){
+  const simdi=Date.now(),bek=I.filter(x=>x.durum==='bekliyor');
+  const kurt=I.filter(x=>x.durum==='vazgecildi').reduce((s,x)=>s+x.u,0);
+  let h=`<div class="kart"><h2>Dürtü freni · 48 saat</h2>`;
+  if(!bek.length)h+=`<div class="not" style="margin-bottom:4px">Plansız bir şey almak istediğinde hemen alma, buraya yaz. 48 saat sonra hâlâ istiyorsan al.</div>`;
+  bek.forEach(x=>{
+    const kalan=x.t0+48*36e5-simdi;
+    h+=`<div class="satir"><div class="ad"><div>${esc(x.ad)}</div><small>${TL(x.u)}${saatKarsilik(x.u)?' · '+saatKarsilik(x.u):''}</small>
+      ${kalan>0?`<div class="sayac">⏳ ${Math.floor(kalan/36e5)} sa ${Math.floor(kalan%36e5/6e4)} dk kaldı</div>`:'<div class="sayac">Süre doldu: hâlâ istiyor musun?</div>'}</div></div>
+      <div class="ikiBtn">${kalan>0?'':`<button class="btn ikincil" data-aldim="${x.id}">Aldım</button>`}<button class="btn ${kalan>0?'ikincil':''}" data-vazgec="${x.id}">Vazgeçtim</button></div>`;
+  });
+  h+=`<div style="display:flex;gap:8px;margin-top:8px"><input id="iAd" placeholder="Ne almak istiyorsun?" style="flex:2"><input id="iTutar" inputmode="decimal" placeholder="₺" style="flex:1"></div>
+    <button class="btn ikincil" id="iEkle">Bekleme listesine ekle</button>`;
+  if(kurt>0)h+=`<div class="ozet" style="margin-top:6px"><span>Vazgeçerek cebinde kalan</span><b class="yesil">${TL(kurt)}</b></div>`;
+  return h+'</div>';
+}
+function istekBagla(){
+  const kaydet=()=>depo.yaz(K.istek,I);
+  if($('#iEkle'))$('#iEkle').onclick=()=>{
+    const ad=$('#iAd').value.trim(),u=parseFloat($('#iTutar').value.replace(/\./g,'').replace(',','.'));
+    if(!ad||!(u>0)){tost('Ne olduğunu ve fiyatını yaz');return;}
+    I.push({id:yeniId(),ad,u,t0:Date.now(),durum:'bekliyor'});kaydet();titresim();tost('⏳ 48 saat sonra tekrar soracağım');ciz();
+  };
+  $$('[data-vazgec]').forEach(b=>b.onclick=()=>{const x=I.find(i=>i.id===b.dataset.vazgec);x.durum='vazgecildi';x.t1=Date.now();kaydet();titresim();tost(`🎉 ${TL(x.u)} cebinde kaldı`);ciz();});
+  $$('[data-aldim]').forEach(b=>b.onclick=()=>{const x=I.find(i=>i.id===b.dataset.aldim);x.durum='alindi';x.t1=Date.now();kaydet();
+    girdiKaydet({id:yeniId(),t:bugun(),s:new Date().toTimeString().slice(0,5),k:'Online Alisveris',a:x.ad,h:'MANUEL / NAKIT',u:-x.u});ciz();});
+}
 function baglaKat(donem,butce,tur){$$('[data-kat]').forEach(e=>e.onclick=()=>git('islem',{kat:e.dataset.kat,donem,butce,tur:tur||'gider'}));}
 
 // ── Özet ───────────────────────────────────────────────────────
@@ -241,6 +388,7 @@ function ozetEkrani(){
   baglaKat('12','Yasam');
   $$('[data-lkat]').forEach(e=>e.onclick=()=>git('islem',{kat:e.dataset.lkat,donem:V.sonAy,butce:'Yasam'}));
   $('#tumKat').onclick=()=>git('kategori',{donem:'12',tur:'gider',butce:'Yasam'});
+  if($('#limitAc'))$('#limitAc').onclick=()=>git('butce');
   if($('#bekleyen'))$('#bekleyen').onclick=()=>git('ekle');
 }
 function satirKat(k,toplam){
@@ -350,73 +498,89 @@ function duzenliOdemeler(){
   });
   return out.sort((a,b)=>b.yil-a.yil).slice(0,10);
 }
+// Önce eyleme dönüşebilecek olanlar: limit aşımı ve artışlar, sonra dikkat, sonra iyi haber, en sonda bilgi
+function oncelikli(){
+  const sira={kotu:0,dikkat:1,iyi:2,bilgi:3};
+  return icgoruler().map((c,i)=>({...c,i})).sort((a,b)=>sira[a.tur]-sira[b.tur]||a.i-b.i);
+}
+function icKart(c,i){
+  return `<div class="kart ic ${c.tur} ${c.eylem?'tik':''}" ${c.eylem?`data-ic="${i}"`:''}><h3>${esc(c.baslik)}</h3><p>${c.metin}</p>${c.eylem?'<div class="git">Ayrıntı ›</div>':''}</div>`;
+}
 function asistanEkrani(){
-  let h='';
-  icgoruler().forEach((c,i)=>{
-    h+=`<div class="kart ic ${c.tur} ${c.eylem?'tik':''}" ${c.eylem?`data-ic="${i}"`:''}><h3>${esc(c.baslik)}</h3><p>${c.metin}</p>${c.eylem?'<div class="git">Ayrıntı ›</div>':''}</div>`;
-  });
+  const liste=oncelikli();
+  let h=`<div class="not" style="margin-bottom:10px">Önce en önemli 3 başlık. Hepsini okuman gerekmez; birine dokun, gerisi beklesin.</div>`;
+  liste.slice(0,3).forEach((c,i)=>h+=icKart(c,i));
+  if(liste.length>3)h+=`<details><summary>Diğer ${liste.length-3} başlık ›</summary>${liste.slice(3).map((c,i)=>icKart(c,i+3)).join('')}</details>`;
   const d=duzenliOdemeler();
   if(d.length){
     const top=d.reduce((a,x)=>a+x.yil,0);
-    h+=`<div class="kart"><h2>Düzenli ödemeler · son 12 ay</h2><div class="not" style="margin-bottom:6px">En az 3 ay, benzer tutarla tekrarlanan ödemeler. Abonelik ve sabit giderlerini burada gözden geçir.</div>`;
+    h+=`<details><summary>Düzenli ödemeler · yılda ${TL(top)} ›</summary><div class="kart"><div class="not" style="margin-bottom:6px">En az 3 ay, benzer tutarla tekrarlanan ödemeler. Abonelik ve sabit giderlerini burada gözden geçir; unutulmuş bir abonelik varsa burada çıkar.</div>`;
     d.forEach(x=>h+=`<div class="satir tik" data-yer="${esc(x.ad)}"><div class="ad"><div>${esc(x.ad)}</div><small>${esc(x.kat)} · ${x.ay} ay</small></div><div class="tut">~${TL(x.ort)}/ay<small>${TL(x.yil)} toplam</small></div></div>`);
-    h+=`<div class="ozet" style="margin-top:8px"><span>Toplam</span><b>${TL(top)}</b></div></div>`;
+    h+=`</div></details>`;
   }
-  h+=`<div class="not">Asistan tüm hesapları bu telefonda yapar; verin hiçbir yere gönderilmez.</div>`;
+  h+=`<div class="not" style="margin-top:10px">Asistan tüm hesapları bu telefonda yapar; verin hiçbir yere gönderilmez.</div>`;
   $('#ekran').innerHTML=h;
-  const liste=icgoruler();
   $$('[data-ic]').forEach(e=>e.onclick=()=>{const c=liste[+e.dataset.ic].eylem;git(c.ekran,c.ayar);});
   $$('[data-yer]').forEach(e=>e.onclick=()=>git('islem',{ara:e.dataset.yer,donem:'12',butce:'Yasam'}));
 }
 
 // ── Kayıt ekle (nakit / unutulan harcama) ─────────────────────────
+// Elle girilebilecek kategoriler: bankanın kendi ürettiği kalemler (komisyon, faiz, POS, transfer…) listeye girmez
+const ELLE_GIRILMEZ=/KOMISYON|FAIZ|NEMA|KMH|KREDI|POS ODEME|TRANSFER|ATM|VERGI|KART|TAHSILAT|EMANET|DESTEGI|TALIMAT/;
 function katListesi(tur){
   const s=new Set();
-  V.tum.filter(x=>x.b==='Yasam'&&(tur==='gider'?x.u<0:x.u>0)).forEach(x=>s.add(x.k));
-  (tur==='gider'?['Market / Alisveris','Yeme / Icme','Ulasim','Diger Gider']:['Maas / Gelir','Diger Gelir']).forEach(k=>s.add(k));
+  V.tum.filter(x=>x.b==='Yasam'&&(tur==='gider'?x.u<0:x.u>0)&&!ELLE_GIRILMEZ.test(norm(x.k))).forEach(x=>s.add(x.k));
+  (tur==='gider'?['Market / Alisveris','Yeme / Icme','Ulasim','Alkol / Sigara','Saglik','Giyim','Eglence','Online Alisveris','Diger Gider']:['Maas / Gelir','Diger Gelir']).forEach(k=>s.add(k));
   return [...s].sort((a,b)=>a.localeCompare(b,'tr'));
+}
+// Sık kullanılan kategoriler önce: telefondan girilenler, sonra son 12 ayın en çok işlem görenleri
+function katSirali(tur){
+  const say={};
+  V.tum.filter(x=>x.b==='Yasam'&&(tur==='gider'?x.u<0:x.u>0)&&!['Kredi Karti Odemesi','ATM / Para Cekme'].includes(x.k)).forEach(x=>say[x.k]=(say[x.k]||0)+(x.tel?5:1));
+  return katListesi(tur).sort((a,b)=>(say[b]||0)-(say[a]||0));
 }
 function ekleEkrani(){
   const hesaplar=['MANUEL / NAKIT',...new Set(V.islemler.map(x=>x.h).filter(h=>h!=='MANUEL / NAKIT'))];
+  const katlar=katSirali(D.ekTur);
+  if(!katlar.includes(D.ekKat))D.ekKat=katlar[0]||'';
+  const one=katlar.slice(0,8),kalan=katlar.slice(8);
   let h=`<div class="kart form">
-    <div class="seg"><button data-et="gider">Gider</button><button data-et="gelir">Gelir</button></div>
-    <label>Tutar (₺)</label><input id="eTutar" class="tutarGir" inputmode="decimal" placeholder="0">
-    <label>Kategori</label><select id="eKat">${katListesi(D.ekTur).map(k=>`<option>${esc(k)}</option>`).join('')}</select>
-    <label>Açıklama</label><input id="eAcik" placeholder="Örn. pazar, taksi, berber">
-    <label>Tarih</label><input id="eTarih" type="date" value="${bugun()}">
-    <label>Hesap</label><select id="eHesap">${hesaplar.map(x=>`<option>${esc(x)}</option>`).join('')}</select>
-    <button class="btn" id="eKaydet">Kaydet</button><div id="eMesaj"></div></div>`;
+    <div class="seg"><button data-et="gider">Harcadım</button><button data-et="gelir">Para geldi</button></div>
+    <input id="eTutar" class="tutarGir" inputmode="decimal" placeholder="0 ₺" autofocus>
+    <div id="eSaat" class="not" style="text-align:center;min-height:18px"></div>
+    <div class="cipler" style="margin-top:10px">${one.map(k=>`<button class="kcip ${k===D.ekKat?'on':''}" data-kat2="${esc(k)}"><b>${emoji(k)}</b>${esc(k)}</button>`).join('')}
+      ${kalan.length?`<select id="eKatDiger" class="kcip"><option value="">Başka…</option>${kalan.map(k=>`<option ${k===D.ekKat?'selected':''}>${esc(k)}</option>`).join('')}</select>`:''}</div>
+    <input id="eAcik" placeholder="Not (isteğe bağlı): pazar, taksi, berber" style="margin-top:10px">
+    <details><summary>Tarih ve hesap (bugün · nakit) ›</summary>
+      <label>Tarih</label><input id="eTarih" type="date" value="${bugun()}">
+      <label>Hesap</label><select id="eHesap">${hesaplar.map(x=>`<option>${esc(x)}</option>`).join('')}</select></details>
+    <button class="btn" id="eKaydet">Kaydet</button></div>`;
   if(G.length){
     h+=`<div class="kart"><h2>Bilgisayara aktarılmayı bekleyen (${G.length})</h2>`;
-    G.slice().reverse().forEach(g=>h+=`<div class="satir"><div class="ad"><div>${esc(g.a||g.k)}</div><small>${tarihTR(g.t)} · ${esc(g.k)} · ${esc(g.h)}</small></div>
+    G.slice().reverse().forEach(g=>h+=`<div class="satir"><div class="ad"><div>${emoji(g.k)} ${esc(g.a||g.k)}</div><small>${tarihTR(g.t)} · ${esc(g.k)} · ${esc(g.h)}</small></div>
       <div class="tut ${g.u<0?'kirmizi':'yesil'}">${g.u<0?'−':'+'}${TL(Math.abs(g.u))}</div><button class="hbtn" data-sil="${g.id}" aria-label="Sil">✕</button></div>`);
-    h+=`<button class="btn" id="aktar">Bilgisayara aktar (dosya)</button>
-      <div class="not">Oluşan <b>telefon_kayitlari_….json</b> dosyasını bilgisayarda masaüstündeki <b>Telefon Verisi</b> klasörüne koy ve Finans Güncelle'yi çalıştır. Kayıtlar Excel'e de eklenir; yeni veri dosyasını telefona aktarınca bu liste kendiliğinden boşalır.</div></div>`;
+    h+=`<button class="btn ikincil" id="aktar">Bilgisayara aktar (dosya)</button>
+      <div class="not">Acelesi yok; ayda bir yeter. Oluşan <b>telefon_kayitlari_….json</b> dosyasını bilgisayarda masaüstündeki <b>Telefon Verisi</b> klasörüne koy ve Finans Güncelle'yi çalıştır. Kayıtlar Excel'e de eklenir; yeni veri dosyasını telefona aktarınca bu liste kendiliğinden boşalır.</div></div>`;
   }
   $('#ekran').innerHTML=h;
-  $$('[data-et]').forEach(b=>{b.classList.toggle('on',b.dataset.et===D.ekTur);b.onclick=()=>{D.ekTur=b.dataset.et;ekleEkrani();};});
-  $('#eKat').value=D.ekTur==='gider'?(katListesi('gider').includes('Market / Alisveris')?'Market / Alisveris':$('#eKat').value):$('#eKat').value;
+  $$('[data-et]').forEach(b=>{b.classList.toggle('on',b.dataset.et===D.ekTur);b.onclick=()=>{D.ekTur=b.dataset.et;D.ekKat='';ekleEkrani();};});
+  $$('[data-kat2]').forEach(b=>b.onclick=()=>{D.ekKat=b.dataset.kat2;$$('[data-kat2]').forEach(x=>x.classList.toggle('on',x===b));if($('#eKatDiger'))$('#eKatDiger').value='';titresim();});
+  if($('#eKatDiger'))$('#eKatDiger').onchange=e=>{if(e.target.value){D.ekKat=e.target.value;$$('[data-kat2]').forEach(x=>x.classList.remove('on'));}};
+  $('#eTutar').oninput=e=>{const u=parseFloat(e.target.value.replace(/\./g,'').replace(',','.'));$('#eSaat').textContent=D.ekTur==='gider'&&u>0?saatKarsilik(u):'';};
   $('#eKaydet').onclick=()=>{
     const u=parseFloat($('#eTutar').value.replace(/\./g,'').replace(',','.'));
-    if(!(u>0)){$('#eMesaj').innerHTML='<div class="uyari">Geçerli bir tutar gir.</div>';return;}
-    const g={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),t:$('#eTarih').value||bugun(),
-      s:new Date().toTimeString().slice(0,5),k:$('#eKat').value,a:$('#eAcik').value.trim(),h:$('#eHesap').value,
-      u:D.ekTur==='gider'?-u:u};
-    G.push(g);const ok=depo.yaz(K.girdi,G);birlestir();ekleEkrani();
-    $('#eMesaj').innerHTML=ok?`<div class="not yesil" style="text-align:center;margin-top:6px">Kaydedildi: ${esc(g.k)} ${TL(u)}</div>`:'<div class="uyari">Telefona kaydedilemedi (tarayıcı depolaması kapalı).</div>';
+    if(!(u>0)){tost('Önce tutarı yaz');$('#eTutar').focus();return;}
+    if(!D.ekKat){tost('Bir kategori seç');return;}
+    girdiKaydet({id:yeniId(),t:$('#eTarih').value||bugun(),s:new Date().toTimeString().slice(0,5),k:D.ekKat,a:$('#eAcik').value.trim(),h:$('#eHesap').value,u:D.ekTur==='gider'?-u:u});
+    ekleEkrani();
   };
   $$('[data-sil]').forEach(b=>b.onclick=()=>{if(confirm('Bu kayıt silinsin mi?')){G=G.filter(g=>g.id!==b.dataset.sil);depo.yaz(K.girdi,G);birlestir();ekleEkrani();}});
   if($('#aktar'))$('#aktar').onclick=disaAktar;
 }
-async function disaAktar(){
+function disaAktar(){
   const d=new Date(),p=n=>String(n).padStart(2,'0');
   const ad=`telefon_kayitlari_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`;
-  const blob=new Blob([JSON.stringify({surum:1,olusturma:d.toISOString(),girisler:G},null,1)],{type:'application/json'});
-  try{
-    const f=new File([blob],ad,{type:'application/json'});
-    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:ad});return;}
-  }catch(e){if(e.name==='AbortError')return;}
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=ad;document.body.appendChild(a);a.click();a.remove();
+  dosyaVer(ad,JSON.stringify({surum:1,olusturma:d.toISOString(),girisler:G},null,1),'application/json');
 }
 
 // ── İşlemler ──────────────────────────────────────────────────
@@ -469,11 +633,11 @@ function listeCiz(){
 
 // ── Diğer menüsü ve alt ekranlar ──────────────────────────────────
 function digerEkrani(){
-  const m=[['kategori','▤','Kategoriler','Gelir ve giderin kategorilere dağılımı'],['yer','⌖','Nereye gitti?','En çok para giden yerler ve kişiler'],
+  const m=[['islem','☰','İşlemler','Tüm hareketler, arama'],['kategori','▤','Kategoriler','Gelir ve giderin kategorilere dağılımı'],['yer','⌖','Nereye gitti?','En çok para giden yerler ve kişiler'],
     ['butce','◎','Bütçe limitleri','Kategori başına aylık limit'],['hesap','▣','Hesaplar','Bankadaki son bakiyeler'],
-    ['veri','⇪','Veri','Yeni veri dosyası aktar, veri durumu'],['guvenlik','⚿','Güvenlik','PIN kilidi, tutarları gizleme']];
+    ['veri','⇪','Veri','Yeni veri dosyası aktar, veri durumu'],['ayar','⚙','Ayarlar','Aylık hedef, saat ücreti, hatırlatıcı, PIN']];
   $('#ekran').innerHTML=`<div class="kart">${m.map(x=>`<div class="menuSatir tik" data-git="${x[0]}"><b>${x[1]}</b><div>${x[2]}<small>${x[3]}</small></div><span class="soluk">›</span></div>`).join('')}</div>
-    <div class="not" style="text-align:center">Kişisel Finans · veriler yalnızca bu telefonda</div>`;
+    <div class="not" style="text-align:center">Berrak · veriler yalnızca bu telefonda</div>`;
   $$('[data-git]').forEach(e=>e.onclick=()=>git(e.dataset.git,{donem:'12',butce:'Yasam',tur:'gider'}));
 }
 function kategoriEkrani(){
@@ -561,27 +725,52 @@ async function ozet256(p){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('kisisel-finans:'+p));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
-function guvenlikEkrani(){
-  let h=`<div class="kart form"><h2>PIN kilidi</h2>
-    <div class="not">${A.pin?'PIN açık: uygulama her açılışta PIN sorar.':'Uygulama açılırken 4–8 haneli PIN sorsun.'} Telefonunu başkası eline aldığında meraklı gözlere karşıdır; telefonun kendi kilidinin yerini tutmaz.</div>
+function ayarEkrani(){
+  const s=saatUcret();
+  let h=`<div class="kart form"><h2>Aylık harcama hedefi</h2>
+    <div class="not">Bugün ekranındaki tek rakam bundan hesaplanır. Boş bırakırsan hedef kapanır.</div>
+    <input id="aHedef" inputmode="numeric" value="${A.hedef||''}" placeholder="örn. 120000">
+    <h2 style="margin-top:16px">Saat ücretin (net)</h2>
+    <div class="not">Harcama girerken "≈ 3 saatlik çalışman" gibi bir karşılık gösterilir; fiyat etiketini zamana çevirmek dürtüyü frenler. Boşsa son 12 ayın gelirinden kendisi hesaplar (şu an ${s>0?TL(s)+'/saat':'hesaplanamadı'}).</div>
+    <input id="aSaat" inputmode="numeric" value="${A.saat||''}" placeholder="₺ / saat">
+    <button class="btn" id="aKaydet">Kaydet</button></div>
+    <div class="kart"><h2>Günlük hatırlatıcı</h2>
+    <div class="not">Uygulama kendi başına bildirim gönderemez; onun yerine telefonun takvimine her akşam 21:00'de tekrarlayan bir hatırlatma eklersin. Dosyayı aç, takvim "ekle" diye sorar.</div>
+    <button class="btn ikincil" id="aTakvim">Takvime hatırlatıcı ekle (21:00)</button></div>
+    <div class="kart form"><h2>PIN kilidi</h2>
+    <div class="not">${A.pin?'PIN açık: uygulama her açılışta PIN sorar.':'Uygulama açılırken 4–8 haneli PIN sorsun.'} Meraklı gözlere karşıdır; telefonun kendi kilidinin yerini tutmaz.</div>
     <label>Yeni PIN</label><input id="p1" type="password" inputmode="numeric" maxlength="8">
     <label>Yeni PIN (tekrar)</label><input id="p2" type="password" inputmode="numeric" maxlength="8">
-    <button class="btn" id="pinKur">${A.pin?'PIN değiştir':'PIN kur'}</button>
+    <button class="btn ikincil" id="pinKur">${A.pin?'PIN değiştir':'PIN kur'}</button>
     ${A.pin?'<button class="btn tehlike" id="pinKaldir">PIN kilidini kaldır</button>':''}<div id="pMesaj"></div></div>
-    <div class="kart"><h2>Tutarları gizle</h2><div class="not">Sağ üstteki ◉ düğmesi bütün tutarları ••• yapar; yanında biri varken uygulamayı açman için.</div></div>`;
+    <div class="kart"><h2>Tutarları gizle</h2><div class="not">Sağ üstteki ◉ düğmesi bütün tutarları ••• yapar; yanında biri varken uygulamayı açman için.</div></div>
+    <div class="kart"><h2>Seri</h2><div class="not">${seriGun()?seriGun()+' gündür her gün kayıt giriyorsun.':'Henüz seri yok.'} Seri kırılırsa dert değil; ertesi gün yeniden başlar, geçmiş kayıtların silinmez.</div></div>`;
   $('#ekran').innerHTML=h;
+  $('#aKaydet').onclick=()=>{
+    const hd=parseFloat($('#aHedef').value.replace(/\./g,'')),sa=parseFloat($('#aSaat').value.replace(/\./g,'').replace(',','.'));
+    if(hd>0)A.hedef=hd;else delete A.hedef;
+    if(sa>0)A.saat=sa;else delete A.saat;
+    depo.yaz(K.ayar,A);titresim();tost('Kaydedildi');ayarEkrani();
+  };
+  $('#aTakvim').onclick=()=>{
+    const d=new Date(),p=n=>String(n).padStart(2,'0'),ymd=`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
+    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berrak//TR','BEGIN:VEVENT',`UID:berrak-gunluk-${ymd}@berrak`,`DTSTAMP:${ymd}T180000Z`,
+      `DTSTART:${ymd}T210000`,`DTEND:${ymd}T210500`,'RRULE:FREQ=DAILY','SUMMARY:Berrak · 1 dakika: bugünkü harcamaları gir',
+      `DESCRIPTION:${UYGULAMA_URL}`,'BEGIN:VALARM','TRIGGER:PT0S','ACTION:DISPLAY','DESCRIPTION:Berrak','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+    dosyaVer('berrak-hatirlatici.ics',ics,'text/calendar');
+  };
   $('#pinKur').onclick=async()=>{
     const a=$('#p1').value,b=$('#p2').value;
     if(!/^\d{4,8}$/.test(a)){$('#pMesaj').innerHTML='<div class="uyari">PIN 4–8 rakam olmalı.</div>';return;}
     if(a!==b){$('#pMesaj').innerHTML='<div class="uyari">İki PIN aynı değil.</div>';return;}
-    A.pin=await ozet256(a);depo.yaz(K.ayar,A);guvenlikEkrani();
+    A.pin=await ozet256(a);depo.yaz(K.ayar,A);ayarEkrani();
     $('#pMesaj').innerHTML='<div class="not yesil" style="text-align:center">PIN kaydedildi.</div>';
   };
-  if($('#pinKaldir'))$('#pinKaldir').onclick=()=>{delete A.pin;depo.yaz(K.ayar,A);guvenlikEkrani();};
+  if($('#pinKaldir'))$('#pinKaldir').onclick=()=>{delete A.pin;depo.yaz(K.ayar,A);ayarEkrani();};
 }
 function kilitGoster(){
   const k=document.createElement('div');k.id='kilit';
-  k.innerHTML=`<div style="font-size:40px">⚿</div><div>Kişisel Finans</div><input id="kPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"><button class="btn" id="kAc">Aç</button><div id="kMesaj" class="kirmizi"></div>`;
+  k.innerHTML=`<div style="font-size:40px">⚿</div><div>Berrak</div><input id="kPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"><button class="btn" id="kAc">Aç</button><div id="kMesaj" class="kirmizi"></div>`;
   document.body.appendChild(k);
   const dene=async()=>{if(await ozet256($('#kPin').value)===A.pin){k.remove();}else{$('#kMesaj').textContent='PIN yanlış';$('#kPin').value='';}};
   $('#kAc').onclick=dene;$('#kPin').onkeydown=e=>{if(e.key==='Enter')dene();};
@@ -596,14 +785,14 @@ $('#dosya').onchange=async e=>{
     const txt=await f.text();
     hazirla(JSON.parse(txt));
     const kalici=depo.yaz(K.veri,txt);
-    git('ozet');
+    git('bugun');
     if(!kalici)alert('Veri açıldı ama telefona kaydedilemedi; uygulama kapanınca yeniden aktarman gerekir.');
   }catch(err){
     if($('#mesaj'))$('#mesaj').innerHTML=`<div class="uyari">Dosya okunamadı: ${esc(err.message)}</div>`;
   }
 };
 $$('#menu button').forEach(b=>b.onclick=()=>git(b.dataset.e,{donem:'12',butce:'Yasam',tur:'gider',sadeceAnom:false}));
-$('#geri').onclick=()=>git('diger');
+$('#geri').onclick=()=>git(D.donus||'diger');
 $('#gizle').onclick=()=>{A.gizli=!A.gizli;depo.yaz(K.ayar,A);ciz();};
 
 try{const d=depo.oku(K.veri,null);if(d)hazirla(d);}catch(e){V=null;}
