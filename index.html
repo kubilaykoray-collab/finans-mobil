@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Berrak</title>
+<title>Mizan</title>
 <meta name="theme-color" content="#0f1420">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -637,7 +637,7 @@ function digerEkrani(){
     ['butce','◎','Bütçe limitleri','Kategori başına aylık limit'],['hesap','▣','Hesaplar','Bankadaki son bakiyeler'],
     ['veri','⇪','Veri','Yeni veri dosyası aktar, veri durumu'],['ayar','⚙','Ayarlar','Aylık hedef, saat ücreti, hatırlatıcı, PIN']];
   $('#ekran').innerHTML=`<div class="kart">${m.map(x=>`<div class="menuSatir tik" data-git="${x[0]}"><b>${x[1]}</b><div>${x[2]}<small>${x[3]}</small></div><span class="soluk">›</span></div>`).join('')}</div>
-    <div class="not" style="text-align:center">Berrak · veriler yalnızca bu telefonda</div>`;
+    <div class="not" style="text-align:center">Mizan · veriler yalnızca bu telefonda</div>`;
   $$('[data-git]').forEach(e=>e.onclick=()=>git(e.dataset.git,{donem:'12',butce:'Yasam',tur:'gider'}));
 }
 function kategoriEkrani(){
@@ -754,10 +754,10 @@ function ayarEkrani(){
   };
   $('#aTakvim').onclick=()=>{
     const d=new Date(),p=n=>String(n).padStart(2,'0'),ymd=`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
-    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berrak//TR','BEGIN:VEVENT',`UID:berrak-gunluk-${ymd}@berrak`,`DTSTAMP:${ymd}T180000Z`,
-      `DTSTART:${ymd}T210000`,`DTEND:${ymd}T210500`,'RRULE:FREQ=DAILY','SUMMARY:Berrak · 1 dakika: bugünkü harcamaları gir',
-      `DESCRIPTION:${UYGULAMA_URL}`,'BEGIN:VALARM','TRIGGER:PT0S','ACTION:DISPLAY','DESCRIPTION:Berrak','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
-    dosyaVer('berrak-hatirlatici.ics',ics,'text/calendar');
+    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mizan//TR','BEGIN:VEVENT',`UID:mizan-gunluk-${ymd}@mizan`,`DTSTAMP:${ymd}T180000Z`,
+      `DTSTART:${ymd}T210000`,`DTEND:${ymd}T210500`,'RRULE:FREQ=DAILY','SUMMARY:Mizan · 1 dakika: bugünkü harcamaları gir',
+      `DESCRIPTION:${UYGULAMA_URL}`,'BEGIN:VALARM','TRIGGER:PT0S','ACTION:DISPLAY','DESCRIPTION:Mizan','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+    dosyaVer('mizan-hatirlatici.ics',ics,'text/calendar');
   };
   $('#pinKur').onclick=async()=>{
     const a=$('#p1').value,b=$('#p2').value;
@@ -770,7 +770,7 @@ function ayarEkrani(){
 }
 function kilitGoster(){
   const k=document.createElement('div');k.id='kilit';
-  k.innerHTML=`<div style="font-size:40px">⚿</div><div>Berrak</div><input id="kPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"><button class="btn" id="kAc">Aç</button><div id="kMesaj" class="kirmizi"></div>`;
+  k.innerHTML=`<div style="font-size:40px">⚿</div><div>Mizan</div><input id="kPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"><button class="btn" id="kAc">Aç</button><div id="kMesaj" class="kirmizi"></div>`;
   document.body.appendChild(k);
   const dene=async()=>{if(await ozet256($('#kPin').value)===A.pin){k.remove();}else{$('#kMesaj').textContent='PIN yanlış';$('#kPin').value='';}};
   $('#kAc').onclick=dene;$('#kPin').onkeydown=e=>{if(e.key==='Enter')dene();};
