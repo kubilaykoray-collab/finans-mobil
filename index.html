@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kişisel Finans</title>
+<meta name="theme-color" content="#0f1420">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="ikon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="ikon-192.png">
+<style>
+:root{
+  --bg:#0f1420;--panel:#171e2d;--surf:#1e2638;--line:#2a3449;
+  --text:#e6eaf2;--muted:#8a94a8;--green:#3ecf8e;--red:#ff6b6b;
+  --blue:#5b9cff;--yellow:#f5c451;--purple:#a78bfa;--orange:#ff9f5a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 -apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+header h1{margin:0;font-size:20px}
+header span{color:var(--muted);font-size:12px}
+main{padding:12px 16px calc(84px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;color:var(--muted);padding:9px 0 8px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button b{font-size:19px;font-weight:400;line-height:1}
+nav button.on{color:var(--blue)}
+.kart{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.kart h2{margin:0 0 10px;font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.uc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.uc div{background:var(--surf);border-radius:10px;padding:10px 8px;min-width:0}
+.uc small{display:block;color:var(--muted);font-size:11px}
+.uc strong{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yesil{color:var(--green)}.kirmizi{color:var(--red)}.soluk{color:var(--muted)}
+.uyari{background:#3a2a10;border:1px solid #6b4d14;color:var(--yellow);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13px}
+.satir{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.satir:last-child{border-bottom:0}
+.satir .ad{flex:1;min-width:0}
+.satir .ad div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.satir .ad small{color:var(--muted);font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.satir .tut{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.satir .tut small{display:block;color:var(--muted);font-size:11px}
+.cubuk{height:6px;background:var(--surf);border-radius:3px;margin-top:5px;overflow:hidden}
+.cubuk i{display:block;height:100%;background:var(--blue);border-radius:3px}
+.ay{display:grid;grid-template-columns:62px 1fr 92px;align-items:center;gap:8px;padding:6px 0;font-size:13px}
+.ay .bar{display:flex;flex-direction:column;gap:3px}
+.ay .bar i{display:block;height:7px;border-radius:3px}
+.ay .tut{text-align:right;font-variant-numeric:tabular-nums}
+.tik{cursor:pointer}
+.arac{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+select,input[type=search]{background:var(--surf);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:15px;min-width:0}
+input[type=search]{flex:1 1 100%}
+select{flex:1}
+.seg{display:flex;background:var(--surf);border-radius:10px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:7px;border-radius:8px;font-size:14px}
+.seg button.on{background:var(--panel);color:var(--text)}
+.cip{display:inline-flex;align-items:center;gap:6px;background:var(--surf);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;margin:0 6px 8px 0}
+.cip button{background:none;border:0;color:var(--muted);font-size:14px;padding:0}
+.btn{display:block;width:100%;background:var(--blue);color:#fff;border:0;border-radius:12px;padding:13px;font-size:16px;font-weight:600;margin:8px 0}
+.btn.ikincil{background:var(--surf);color:var(--text);border:1px solid var(--line)}
+.detay{color:var(--muted);font-size:12px;padding:0 0 10px;word-break:break-word}
+ol{padding-left:20px;margin:6px 0}ol li{margin:4px 0}
+.ozet{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:6px}
+</style>
+</head>
+<body>
+<header><h1 id="baslik">Özet</h1><span id="altbaslik"></span></header>
+<main id="ekran"></main>
+<nav id="menu">
+  <button data-e="ozet"><b>◔</b>Özet</button>
+  <button data-e="kategori"><b>▤</b>Kategori</button>
+  <button data-e="islem"><b>☰</b>İşlemler</button>
+  <button data-e="yer"><b>⌖</b>Nereye</button>
+  <button data-e="veri"><b>⇪</b>Veri</button>
+</nav>
+<input type="file" id="dosya" accept=".json,application/json" hidden>
+<script>
+'use strict';
+const AYLAR=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const BUTCE_AD={Yasam:'Yaşam',Transfer:'Transfer',Yatirim:'Yatırım',Borc:'Borç'};
+const ANAHTAR='finans_veri_v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TL=n=>Math.round(n).toLocaleString('tr-TR')+' ₺';
+const ayAdi=a=>AYLAR[+a.slice(5,7)-1]+' '+a.slice(0,4);
+const ayKisa=a=>AYLAR[+a.slice(5,7)-1].slice(0,3)+' '+a.slice(2,4);
+const tarihTR=t=>t.slice(8,10)+'.'+t.slice(5,7)+'.'+t.slice(0,4);
+const norm=s=>s.toLocaleUpperCase('tr-TR').replace(/İ/g,'I').replace(/Ğ/g,'G').replace(/Ü/g,'U').replace(/Ş/g,'S').replace(/Ö/g,'O').replace(/Ç/g,'C');
+
+let V=null;
+const D={ekran:'ozet',donem:'12',tur:'gider',butce:'Yasam',kat:'',ara:'',limit:150,acik:-1};
+
+function veriYukle(){
+  try{const s=localStorage.getItem(ANAHTAR);if(s)hazirla(JSON.parse(s));}catch(e){V=null;}
+}
+function hazirla(d){
+  if(!d||!Array.isArray(d.islemler))throw new Error('Bu dosya finans verisi değil.');
+  d.islemler.forEach((x,i)=>{x.i=i;x.m=x.t.slice(0,7);x.ara=norm(x.a+' '+x.y+' '+x.k+' '+x.h);});
+  const aylar=[...new Set(d.islemler.map(x=>x.m))].sort();
+  d.aylar=aylar;d.son12=aylar.slice(-12);
+  V=d;
+}
+
+// Seçili döneme göre işlemler: '12' = son 12 ay, 'hepsi', veya 'YYYY-MM'
+function donemIslem(donem){
+  if(donem==='hepsi')return V.islemler;
+  if(donem==='12'){const s=new Set(V.son12);return V.islemler.filter(x=>s.has(x.m));}
+  return V.islemler.filter(x=>x.m===donem);
+}
+function donemAdi(donem){return donem==='12'?'Son 12 ay':donem==='hepsi'?'Tüm dönem':ayAdi(donem);}
+function donemSecici(){
+  let h='<select id="donem"><option value="12">Son 12 ay</option><option value="hepsi">Tüm dönem</option>';
+  [...V.aylar].reverse().forEach(a=>h+=`<option value="${a}">${ayAdi(a)}</option>`);
+  return h+'</select>';
+}
+function topla(liste){let g=0,c=0;liste.forEach(x=>{if(x.u>0)g+=x.u;else c-=x.u;});return{g,c,n:g-c};}
+function grupla(liste,anahtar){
+  const m=new Map();
+  liste.forEach(x=>{const k=x[anahtar]||'—';const o=m.get(k)||{ad:k,t:0,s:0};o.t+=Math.abs(x.u);o.s++;m.set(k,o);});
+  return [...m.values()].sort((a,b)=>b.t-a.t);
+}
+function eskiMi(){return Math.floor((Date.now()-new Date(V.son+'T00:00:00'))/864e5);}
+
+function ciz(){
+  document.querySelectorAll('#menu button').forEach(b=>b.classList.toggle('on',b.dataset.e===D.ekran));
+  const basliklar={ozet:'Özet',kategori:'Kategoriler',islem:'İşlemler',yer:'Nereye Gitti?',veri:'Veri'};
+  $('#baslik').textContent=basliklar[D.ekran];
+  $('#altbaslik').textContent=V?`${tarihTR(V.ilk)} – ${tarihTR(V.son)}`:'';
+  if(!V&&D.ekran!=='veri'){D.ekran='veri';return ciz();}
+  ({ozet:ozetEkrani,kategori:kategoriEkrani,islem:islemEkrani,yer:yerEkrani,veri:veriEkrani})[D.ekran]();
+  window.scrollTo(0,0);
+}
+function git(ekran,ayar){Object.assign(D,{kat:'',ara:'',limit:150,acik:-1},ayar||{});D.ekran=ekran;ciz();}
+
+function ozetEkrani(){
+  const yasam=V.islemler.filter(x=>x.b==='Yasam');
+  const sonAy=V.aylar[V.aylar.length-1];
+  const s=topla(yasam.filter(x=>x.m===sonAy));
+  const set12=new Set(V.son12);
+  const y12=yasam.filter(x=>set12.has(x.m));
+  const t=topla(y12);
+  let h='';
+  const gun=eskiMi();
+  if(gun>45)h+=`<div class="uyari">Veriler ${gun} gün eski. Bankadan yeni ekstre indirip bilgisayarda GÜNCELLE'yi çalıştır, sonra yeni dosyayı buraya aktar.</div>`;
+  h+=`<div class="kart"><h2>${ayAdi(sonAy)} · Yaşam bütçesi</h2><div class="uc">
+    <div><small>Gelir</small><strong class="yesil">${TL(s.g)}</strong></div>
+    <div><small>Gider</small><strong class="kirmizi">${TL(s.c)}</strong></div>
+    <div><small>Net</small><strong class="${s.n<0?'kirmizi':'yesil'}">${TL(s.n)}</strong></div></div></div>`;
+  h+=`<div class="kart"><h2>Son 12 ay · ${ayKisa(V.son12[0])} – ${ayKisa(sonAy)}</h2><div class="uc">
+    <div><small>Gelir</small><strong class="yesil">${TL(t.g)}</strong></div>
+    <div><small>Gider</small><strong class="kirmizi">${TL(t.c)}</strong></div>
+    <div><small>Net</small><strong class="${t.n<0?'kirmizi':'yesil'}">${TL(t.n)}</strong></div></div>
+    <div class="ozet" style="margin:10px 0 0"><span>Aylık ortalama gider</span><b style="color:var(--text)">${TL(t.c/V.son12.length)}</b></div></div>`;
+  // Aylık çubuklar
+  const aylik=V.son12.map(a=>({a,...topla(yasam.filter(x=>x.m===a))}));
+  const mx=Math.max(1,...aylik.map(x=>Math.max(x.g,x.c)));
+  h+=`<div class="kart"><h2>Aylık gelir / gider</h2>`;
+  [...aylik].reverse().forEach(x=>{
+    h+=`<div class="ay tik" data-ay="${x.a}"><span>${ayKisa(x.a)}</span><span class="bar">
+      <i style="width:${x.g/mx*100}%;background:var(--green)"></i><i style="width:${x.c/mx*100}%;background:var(--red)"></i></span>
+      <span class="tut ${x.n<0?'kirmizi':'yesil'}">${TL(x.n)}</span></div>`;
+  });
+  h+=`<div class="soluk" style="font-size:12px;margin-top:6px">Yeşil gelir, kırmızı gider, sağdaki rakam net. Aya dokununca o ayın kategorileri açılır.</div></div>`;
+  // En büyük kategoriler
+  const kat=grupla(y12.filter(x=>x.u<0),'k').slice(0,6);
+  h+=`<div class="kart"><h2>Son 12 ay · en çok harcanan</h2>`;
+  kat.forEach(k=>h+=satirKat(k,t.c));
+  h+=`<button class="btn ikincil" id="tumKat">Tüm kategoriler</button></div>`;
+  const kk=y12.filter(x=>x.k==='Kredi Karti Odemesi').reduce((a,x)=>a-x.u,0);
+  if(kk>0)h+=`<div class="uyari">Giderin %${Math.round(kk/t.c*100)}'i kredi kartı ödemesi (${TL(kk)}). Kartla nereye harcandığı, kart ekstresi eklenince görünecek.</div>`;
+  h+=`<div class="soluk" style="font-size:12px">Yaşam bütçesi; hesaplar arası transferleri, trading/döviz ve borç hareketlerini saymaz. Böylece aynı para iki kez sayılmaz.</div>`;
+  $('#ekran').innerHTML=h;
+  document.querySelectorAll('[data-ay]').forEach(e=>e.onclick=()=>git('kategori',{donem:e.dataset.ay,tur:'gider',butce:'Yasam'}));
+  document.querySelectorAll('[data-kat]').forEach(e=>e.onclick=()=>git('islem',{kat:e.dataset.kat,donem:'12',butce:'Yasam'}));
+  $('#tumKat').onclick=()=>git('kategori',{donem:'12',tur:'gider',butce:'Yasam'});
+}
+function satirKat(k,toplam){
+  const p=toplam>0?k.t/toplam*100:0;
+  return `<div class="satir tik" data-kat="${esc(k.ad)}"><div class="ad"><div>${esc(k.ad)}</div>
+    <div class="cubuk"><i style="width:${p}%"></i></div></div>
+    <div class="tut">${TL(k.t)}<small>%${p.toFixed(1)} · ${k.s} işlem</small></div></div>`;
+}
+
+function butceSecici(){
+  return `<select id="butce"><option value="Yasam">Yaşam bütçesi</option><option value="">Tüm hareketler</option>
+    <option value="Transfer">Transfer</option><option value="Yatirim">Yatırım / Trading</option><option value="Borc">Borç</option></select>`;
+}
+function kategoriEkrani(){
+  let liste=donemIslem(D.donem);
+  if(D.butce)liste=liste.filter(x=>x.b===D.butce);
+  liste=liste.filter(x=>D.tur==='gider'?x.u<0:x.u>0);
+  const toplam=liste.reduce((a,x)=>a+Math.abs(x.u),0);
+  let h=`<div class="arac">${donemSecici()}${butceSecici()}</div>
+    <div class="seg"><button data-tur="gider">Gider</button><button data-tur="gelir">Gelir</button></div>
+    <div class="ozet"><span>${donemAdi(D.donem)} · ${D.tur==='gider'?'gider':'gelir'}</span><b class="${D.tur==='gider'?'kirmizi':'yesil'}">${TL(toplam)}</b></div><div class="kart">`;
+  const g=grupla(liste,'k');
+  if(!g.length)h+='<div class="soluk">Bu seçimde işlem yok.</div>';
+  g.forEach(k=>h+=satirKat(k,toplam));
+  $('#ekran').innerHTML=h+'</div>';
+  $('#donem').value=D.donem;$('#butce').value=D.butce;
+  document.querySelectorAll('[data-tur]').forEach(b=>{b.classList.toggle('on',b.dataset.tur===D.tur);b.onclick=()=>{D.tur=b.dataset.tur;ciz();};});
+  $('#donem').onchange=e=>{D.donem=e.target.value;ciz();};
+  $('#butce').onchange=e=>{D.butce=e.target.value;ciz();};
+  document.querySelectorAll('[data-kat]').forEach(e=>e.onclick=()=>git('islem',{kat:e.dataset.kat,donem:D.donem,butce:D.butce,tur:D.tur}));
+}
+
+function islemEkrani(){
+  let h=`<div class="arac"><input type="search" id="ara" placeholder="Ara: market, kişi adı, açıklama…" value="${esc(D.ara)}">${donemSecici()}${butceSecici()}</div><div id="cipler"></div><div id="liste"></div>`;
+  $('#ekran').innerHTML=h;
+  $('#donem').value=D.donem;$('#butce').value=D.butce;
+  $('#donem').onchange=e=>{D.donem=e.target.value;D.limit=150;listeCiz();};
+  $('#butce').onchange=e=>{D.butce=e.target.value;D.limit=150;listeCiz();};
+  $('#ara').oninput=e=>{D.ara=e.target.value;D.limit=150;listeCiz();};
+  listeCiz();
+}
+function listeCiz(){
+  let liste=donemIslem(D.donem);
+  if(D.butce)liste=liste.filter(x=>x.b===D.butce);
+  if(D.kat)liste=liste.filter(x=>x.k===D.kat&&(D.tur==='gelir'?x.u>0:x.u<0));
+  const q=norm(D.ara.trim());
+  if(q)liste=liste.filter(x=>x.ara.includes(q));
+  $('#cipler').innerHTML=D.kat?`<span class="cip">${esc(D.kat)}<button id="katSil" aria-label="Filtreyi kaldır">✕</button></span>`:'';
+  if(D.kat)$('#katSil').onclick=()=>{D.kat='';listeCiz();};
+  const t=topla(liste);
+  let h=`<div class="ozet"><span>${liste.length} işlem</span><span><span class="yesil">+${TL(t.g)}</span> · <span class="kirmizi">−${TL(t.c)}</span></span></div><div class="kart">`;
+  liste.slice(0,D.limit).forEach(x=>{
+    h+=`<div class="satir tik" data-i="${x.i}"><div class="ad"><div>${esc(x.y||x.a)}${x.n?' <span style="color:var(--yellow)">⚑</span>':''}</div>
+      <small>${tarihTR(x.t)} · ${esc(x.k)} · ${esc(x.h)}</small></div>
+      <div class="tut ${x.u<0?'kirmizi':'yesil'}">${x.u<0?'−':'+'}${TL(Math.abs(x.u))}</div></div>`;
+    if(D.acik===x.i)h+=`<div class="detay">${esc(x.a)}<br>${x.s?'Saat '+esc(x.s)+' · ':''}Bütçe: ${BUTCE_AD[x.b]||esc(x.b)}${x.n?' · ⚑ Bu kategoride alışılmadık büyüklükte':''}</div>`;
+  });
+  if(!liste.length)h+='<div class="soluk">Eşleşen işlem yok.</div>';
+  h+='</div>';
+  if(liste.length>D.limit)h+=`<button class="btn ikincil" id="dahaFazla">Daha fazla göster (${liste.length-D.limit} kaldı)</button>`;
+  $('#liste').innerHTML=h;
+  document.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>{const i=+e.dataset.i;D.acik=D.acik===i?-1:i;listeCiz();});
+  if($('#dahaFazla'))$('#dahaFazla').onclick=()=>{D.limit+=150;listeCiz();};
+}
+
+function yerEkrani(){
+  let liste=donemIslem(D.donem).filter(x=>x.b==='Yasam'&&x.u<0);
+  const toplam=liste.reduce((a,x)=>a-x.u,0);
+  const g=grupla(liste,'y').slice(0,40);
+  let h=`<div class="arac">${donemSecici()}</div><div class="ozet"><span>${donemAdi(D.donem)} · yaşam gideri, en çok para giden 40 yer/kişi</span></div><div class="kart">`;
+  g.forEach(k=>{const p=toplam>0?k.t/toplam*100:0;
+    h+=`<div class="satir tik" data-yer="${esc(k.ad)}"><div class="ad"><div>${esc(k.ad)}</div><div class="cubuk"><i style="width:${p}%;background:var(--orange)"></i></div></div>
+      <div class="tut">${TL(k.t)}<small>${k.s} işlem</small></div></div>`;});
+  if(!g.length)h+='<div class="soluk">Bu dönemde yaşam gideri yok.</div>';
+  $('#ekran').innerHTML=h+'</div>';
+  $('#donem').value=D.donem;
+  $('#donem').onchange=e=>{D.donem=e.target.value;ciz();};
+  document.querySelectorAll('[data-yer]').forEach(e=>e.onclick=()=>git('islem',{ara:e.dataset.yer,donem:D.donem,butce:'Yasam'}));
+}
+
+function veriEkrani(){
+  let h='';
+  if(V){
+    const gun=eskiMi();
+    h+=`<div class="kart"><h2>Yüklü veri</h2>
+      <div class="ozet"><span>Hazırlanma</span><b style="color:var(--text)">${esc(V.olusturma)}</b></div>
+      <div class="ozet"><span>Kapsam</span><b style="color:var(--text)">${tarihTR(V.ilk)} – ${tarihTR(V.son)}</b></div>
+      <div class="ozet"><span>İşlem sayısı</span><b style="color:var(--text)">${V.islemler.length.toLocaleString('tr-TR')}</b></div>
+      <div class="ozet"><span>Son işlemden bu yana</span><b class="${gun>45?'kirmizi':''}" style="${gun>45?'':'color:var(--text)'}">${gun} gün</b></div></div>`;
+  }else{
+    h+=`<div class="kart"><h2>Hoş geldin</h2><div>Henüz veri yok. Bilgisayardaki finans sisteminin ürettiği <b>finans_veri.json</b> dosyasını aşağıdaki düğmeyle aç.</div></div>`;
+  }
+  h+=`<button class="btn" id="ac">${V?'Yeni veri dosyası aktar':'Veri dosyasını aç'}</button><div id="mesaj"></div>
+    <div class="kart"><h2>Nasıl güncellenir?</h2><ol>
+      <li>Bilgisayarda masaüstündeki <b>Finans Güncelle</b>'yi çalıştır.</li>
+      <li><b>banka girdileri\\mobil\\finans_veri.json</b> dosyasını telefona at (kablo veya kendi bulut klasörün).</li>
+      <li>Burada <b>Yeni veri dosyası aktar</b> ile o dosyayı seç.</li></ol>
+      <div class="soluk" style="font-size:12px">Veri sadece bu telefonda saklanır, hiçbir sunucuya gönderilmez. Uygulama internetsiz de çalışır.</div></div>`;
+  if(V)h+=`<button class="btn ikincil" id="sil">Bu telefondaki veriyi sil</button>`;
+  $('#ekran').innerHTML=h;
+  $('#ac').onclick=()=>$('#dosya').click();
+  if($('#sil'))$('#sil').onclick=()=>{if(confirm('Telefondaki finans verisi silinsin mi?')){try{localStorage.removeItem(ANAHTAR);}catch(e){}V=null;ciz();}};
+}
+
+$('#dosya').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';
+  if(!f)return;
+  try{
+    const txt=await f.text();
+    hazirla(JSON.parse(txt));
+    let kalici=true;
+    try{localStorage.setItem(ANAHTAR,txt);}catch(_){kalici=false;}
+    git('ozet');
+    if(!kalici)alert('Veri açıldı ama telefona kaydedilemedi; uygulama kapanınca yeniden aktarman gerekir.');
+  }catch(err){
+    $('#mesaj').innerHTML=`<div class="uyari">Dosya okunamadı: ${esc(err.message)}</div>`;
+  }
+};
+document.querySelectorAll('#menu button').forEach(b=>b.onclick=()=>git(b.dataset.e,{donem:'12',butce:'Yasam',tur:'gider'}));
+
+veriYukle();
+ciz();
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
